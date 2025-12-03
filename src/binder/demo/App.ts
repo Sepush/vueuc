@@ -3,6 +3,7 @@ import { Placement } from '../src/interface'
 import PlacementGroup from './PlacementGroup'
 import ScrollDocument from './ScrollDocument'
 import ScrollNestedDiv from './ScrollNestedDiv'
+import SvgFollowDemo from './SvgFollowDemo'
 
 export default defineComponent({
   name: 'BinderDemo',
@@ -10,7 +11,8 @@ export default defineComponent({
     const syncOnResizeRef = ref(false)
     const syncOnScrollRef = ref(false)
     return {
-      showPart: ref('document'),
+      showPart: ref<'document' | 'nested'>('document'),
+      showSvgDemo: ref(false),
       // demo
       placement: ref<Placement>('bottom'),
       position: ref<'absolute' | 'fixed'>('fixed'),
@@ -49,17 +51,45 @@ export default defineComponent({
       y: this.y,
       overlap: this.overlap
     }
+    const demoNode = this.showSvgDemo
+      ? h(SvgFollowDemo, {
+        show: this.show,
+        scrollMode: this.showPart,
+        placement: this.placement,
+        strategy: this.position,
+        syncTrigger: this.syncTrigger,
+        flip: this.flip,
+        internalShift: this.shift,
+        overlap: this.overlap,
+        useTargetWidth: this.useTargetWidth,
+        x: this.x,
+        y: this.y
+      })
+      : this.showPart === 'document'
+        ? h(ScrollDocument, followerProps)
+        : h(ScrollNestedDiv, followerProps)
     return h(Fragment, [
       h(
         'button',
         {
           onClick: () => {
-            this.showPart === 'document'
-              ? (this.showPart = 'nested')
-              : (this.showPart = 'document')
+            if (this.showPart === 'document') {
+              this.showPart = 'nested'
+            } else {
+              this.showPart = 'document'
+            }
           }
         },
         ['scroll: ', this.showPart]
+      ),
+      h(
+        'button',
+        {
+          onClick: () => {
+            this.showSvgDemo = !this.showSvgDemo
+          }
+        },
+        ['svg demo: ', this.showSvgDemo.toString()]
       ),
       h(
         'button',
@@ -154,9 +184,7 @@ export default defineComponent({
           this.placement = placement
         }
       }),
-      this.showPart === 'document'
-        ? h(ScrollDocument, followerProps)
-        : h(ScrollNestedDiv, followerProps)
+      demoNode
     ])
   }
 })

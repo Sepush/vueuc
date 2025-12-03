@@ -6,3 +6,4 @@ export type {
   Placement as FollowerPlacement,
   ExposedBinderInstance as BinderInst
 } from './interface'
+export { useFollow } from './useFollow'

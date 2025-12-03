@@ -34,7 +34,7 @@ export function getPointRect (x: number, y: number): Rect {
   }
 }
 
-export function getRect (el: HTMLElement): Rect {
+export function getRect (el: Element): Rect {
   const elRect = el.getBoundingClientRect()
   const viewRect = ensureViewBoundingRect()
   return {
